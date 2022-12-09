@@ -9,5 +9,11 @@
 
 # Add any project specific keep options here:
 
+#react-native-reanimated
 -keep class com.swmansion.reanimated.** { *; }
 -keep class com.facebook.react.turbomodule.** { *; }
+
+#react-native-config - !!! CHANGE PACKAGE NAME !!!
+-keep class com.rnboilerplate.BuildConfig { *; }
+#If using Dexguard, the shrinking phase will remove resources it thinks are unused. It is necessary to add an exception to preserve the build config package name.
+-keepresources string/build_config_package
