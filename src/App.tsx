@@ -1,8 +1,8 @@
 import {
   AppNavigationContainer,
+  GestureHandlerContainer,
   SafeAreaContainer,
 } from '@boilerplate/containers';
-import {GestureHandlerContainer} from '@boilerplate/containers/GestureHandlerContainer';
 import React from 'react';
 
 const App = () => {
