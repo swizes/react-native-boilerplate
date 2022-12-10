@@ -6,6 +6,8 @@ project.ext.envConfigFiles = [
 ]
 
 apply plugin: "com.android.application"
+//react-native-firebase
+apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -104,7 +106,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -148,7 +150,9 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-
+        multiDexEnabled true
+        //react-native-config
+        resValue "string", "build_config_package", "com.rnboilerplate"
         if (isNewArchitectureEnabled()) {
             // We configure the CMake build only if you decide to opt-in for the New Architecture.
             externalNativeBuild {
@@ -218,21 +222,39 @@ android {
         }
     }
     signingConfigs {
+
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        dev {
+            if (project.hasProperty('DEV_RELEASE_KEYSTORE_FILE')) {
+                storeFile file(DEV_RELEASE_KEYSTORE_FILE)
+                storePassword DEV_RELEASE_KEYSTORE_PASSWORD
+                keyAlias DEV_RELEASE_KEYSTORE_ALIAS
+                keyPassword DEV_RELEASE_KEYSTORE_ALIAS_PASSWORD
+            }
+        }
+        release {
+            if (project.hasProperty('RELEASE_KEYSTORE_FILE')) {
+                storeFile file(RELEASE_KEYSTORE_FILE)
+                storePassword RELEASE_KEYSTORE_PASSWORD
+                keyAlias RELEASE_KEYSTORE_ALIAS
+                keyPassword RELEASE_KEYSTORE_ALIAS_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            //signingConfig signingConfigs.release
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            //signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -242,10 +264,12 @@ android {
         productFlavors {
             prod {
                 resValue "string", "TestString", 'This is prod'
+                signingConfig signingConfigs.release
             }
             dev {
                 applicationIdSuffix ".dev"
                 resValue "string", "TestString", 'This is dev'
+                signingConfig signingConfigs.dev
             }
     }
 
@@ -273,6 +297,9 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+    //required for multidex
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
@@ -321,6 +348,8 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+//react-native-config
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 def isNewArchitectureEnabled() {
     // To opt-in for the New Architecture, you can either:

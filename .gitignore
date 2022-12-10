@@ -31,7 +31,6 @@ local.properties
 *.iml
 *.hprof
 .cxx/
-
 # node.js
 #
 node_modules/
@@ -43,6 +42,7 @@ buck-out/
 \.buckd/
 *.keystore
 !debug.keystore
+!devdebug.keystore
 
 # fastlane
 #
@@ -62,3 +62,8 @@ buck-out/
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
